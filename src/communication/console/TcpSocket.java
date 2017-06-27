@@ -76,4 +76,10 @@ public class TcpSocket{
 	}
 
 
+	public synchronized void send(String name) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }
