@@ -25,10 +25,25 @@ public class Image {
 		this.file = file;
 	}
 	
+/**
+ * プロトコルに従ってファイルを送信。
+ * 送信するデータは次のような感じ
+ * <p style="padding-left:2em">
+ *   image add {@literal <name><CR><LF>}<br>
+ *   size=123456{@literal <CR><LF>}<br>
+ *   DATA本体<br>
+ * </p>
+ * 
+ * @param out - ファイルを送信する先を指定。
+ * @return {@code true} : 送信処理が正常に終了。<br> {@code false} : 送信処理が正常に終了。
+ * @throws FileNotFoundException
+ */
 	public boolean upload(OutputStream out) throws FileNotFoundException{
-		// ファイルサイズの出力
+		// コマンドとファイルサイズの出力
 		try {
-			String size_info = "size=" + Long.toString(file.length()) + CRLF;
+			String size_info = "";
+			size_info += "image add " + file.getName() + CRLF;
+			size_info += "size=" + Long.toString(file.length()) + CRLF;
 			out.write(size_info.getBytes());
 		} catch (IOException e) {
 			log_mes.log_print(e);
@@ -54,6 +69,12 @@ public class Image {
 		}
 	}
 	
+/**
+ * ハッシュ値をMD5で計算する。
+ *
+ * @return 基本はハッシュ値を返す。何かしらのエラーで{@code null}を返す。
+ * @throws FileNotFoundException
+ */
 	public byte[] get_md5() throws FileNotFoundException{
 		MessageDigest md;
 		FileInputStream file_in = new FileInputStream(file);
@@ -74,7 +95,6 @@ public class Image {
 			log_mes.log_print(e);
 			return null;
 		}
-
 	}
 
 }
