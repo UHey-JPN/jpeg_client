@@ -4,8 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import window.main.LogMessageAdapter;
 
@@ -36,21 +37,44 @@ public class Image {
 		
 		// ファイルデータの出力
 		try {
-			int fileLength;
+			int len;
 			byte[] buffer = new byte[512];
 			
-			InputStream inputStream = new FileInputStream(file);
+			FileInputStream file_in = new FileInputStream(file);
 			
-			while ( (fileLength = inputStream.read(buffer)) > 0 ) {
-				out.write(buffer, 0, fileLength);
+			while ( (len = file_in.read(buffer)) > 0 ) {
+				out.write(buffer, 0, len);
 			}
-			inputStream.close();
+			file_in.close();
 			return true;
 			
 		} catch (IOException e) {
 			log_mes.log_print(e);
 			return false;
 		}
+	}
+	
+	public byte[] get_md5() throws FileNotFoundException{
+		MessageDigest md;
+		FileInputStream file_in = new FileInputStream(file);
+		
+		try {
+			md = MessageDigest.getInstance("MD5");
+			
+			int len;
+			byte[] buffer = new byte[512];
+			while ( (len = file_in.read(buffer)) > 0 ) {
+				md.update(buffer, 0, len);
+			}
+			
+			file_in.close();
+			
+			return md.digest();
+		} catch (NoSuchAlgorithmException|IOException e) {
+			log_mes.log_print(e);
+			return null;
+		}
+
 	}
 
 }
