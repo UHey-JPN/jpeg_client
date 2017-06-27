@@ -35,7 +35,10 @@ public class Image {
  * </p>
  * 
  * @param out - ファイルを送信する先を指定。
- * @return {@code true} : 送信処理が正常に終了。<br> {@code false} : 送信処理が正常に終了。
+ * @return
+ * {@code true} : 送信処理が正常に終了。<br>
+ * {@code false} : 送信処理が正常に終了。
+ * 
  * @throws FileNotFoundException
  */
 	public boolean upload(OutputStream out) throws FileNotFoundException{
