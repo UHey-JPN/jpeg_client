@@ -2,9 +2,12 @@ package communication.console;
 
 import java.net.Socket;
 
+import data.image.Image;
 import window.main.LogMessageAdapter;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -77,8 +80,15 @@ public class TcpSocket{
 
 
 	public synchronized void send(String name) {
-		// TODO Auto-generated method stub
-		
+		try {
+			out.flush();
+			Image img = new Image(new File(name), log_mes);
+			img.upload(soc.getOutputStream());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 
