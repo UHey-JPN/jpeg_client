@@ -25,22 +25,22 @@ public class Image {
 		this.file = file;
 	}
 	
-/**
- * プロトコルに従ってファイルを送信。
- * 送信するデータは次のような感じ
- * <p style="padding-left:2em">
- *   image add {@literal <name><CR><LF>}<br>
- *   size=123456{@literal <CR><LF>}<br>
- *   DATA本体<br>
- * </p>
- * 
- * @param out - ファイルを送信する先を指定。
- * @return
- * {@code true} : 送信処理が正常に終了。<br>
- * {@code false} : 送信処理が正常に終了。
- * 
- * @throws FileNotFoundException
- */
+	/**
+	 * プロトコルに従ってファイルを送信。
+	 * 送信するデータは次のような感じ
+	 * <p style="padding-left:2em">
+	 *   image add {@literal <name><CR><LF>}<br>
+	 *   size=123456{@literal <CR><LF>}<br>
+	 *   DATA本体<br>
+	 * </p>
+	 * 
+	 * @param out - ファイルを送信する先を指定。
+	 * @return
+	 * {@code true} : 送信処理が正常に終了。<br>
+	 * {@code false} : 送信処理が正常に終了。
+	 * 
+	 * @throws FileNotFoundException
+	 */
 	public boolean upload(OutputStream out) throws FileNotFoundException{
 		// コマンドとファイルサイズの出力
 		try {
@@ -72,12 +72,28 @@ public class Image {
 		}
 	}
 	
-/**
- * ハッシュ値をMD5で計算する。
- *
- * @return 基本はハッシュ値を返す。何かしらのエラーで{@code null}を返す。
- * @throws FileNotFoundException
- */
+	/**
+	 * MD5を文字列形式で取得
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public String get_md5_str() throws FileNotFoundException{
+		byte[] md = get_md5();
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < md.length; i++){
+			int b = md[i] & 0xFF;
+			if( b < 15 ) sb.append("0");
+			sb.append(Integer.toHexString(b));
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * ハッシュ値をMD5で計算する。
+	 *
+	 * @return 基本はハッシュ値を返す。何かしらのエラーで{@code null}を返す。
+	 * @throws FileNotFoundException
+	 */
 	public byte[] get_md5() throws FileNotFoundException{
 		MessageDigest md;
 		FileInputStream file_in = new FileInputStream(file);
