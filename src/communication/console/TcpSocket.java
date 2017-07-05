@@ -79,15 +79,27 @@ public class TcpSocket{
 	}
 
 
-	public synchronized void send(String name) {
+	public synchronized boolean send_img(String name) {
 		try {
-			out.flush();
 			Image img = new Image(new File(name), log_mes);
-			img.upload(soc.getOutputStream());
+			out.println("image add " + name);				// 画像アップロードのコマンド
+			String[] soc_info = in.readLine().split(",");	// アップロード先の指示待ち
+			String addr = soc_info[0];
+			int port = Integer.parseInt(soc_info[1]);
+			img.upload(new InetSocketAddress(addr, port));
+			
+			// サーバーでの処理結果を確認
+			if(in.readLine().matches("OK")){
+				return true;
+			}else{
+				return false;
+			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			log_mes.log_println("File(" + name + ") is not exist.");
+			return false;
 		} catch (IOException e) {
-			e.printStackTrace();
+			log_mes.log_print(e);
+			return false;
 		}
 	}
 

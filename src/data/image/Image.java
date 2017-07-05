@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -34,22 +36,50 @@ public class Image {
 	 *   DATA本体<br>
 	 * </p>
 	 * 
-	 * @param out - ファイルを送信する先を指定。
+	 * @param addr - ファイルを送信する先を指定。
 	 * @return
 	 * {@code true} : 送信処理が正常に終了。<br>
 	 * {@code false} : 送信処理が正常に終了。
 	 * 
 	 * @throws FileNotFoundException
 	 */
-	public boolean upload(OutputStream out) throws FileNotFoundException{
+	public boolean upload(InetSocketAddress addr) throws FileNotFoundException{
+		// データ送信用のソケットを準備
+		Socket soc = null;
+		OutputStream out;
+		try {
+			soc = new Socket();
+			soc.connect(addr, 200);
+			soc.setSoTimeout(2000);
+			out = soc.getOutputStream();
+			log_mes.log_println("connected to server("+ soc.getRemoteSocketAddress() +")");
+		} catch (IOException e) {
+			log_mes.log_print(e);
+			try {
+				if(soc != null)
+					soc.close();
+			} catch (IOException e1) {
+				log_mes.log_print(e1);
+			}
+			return false;
+		}
+
+
+
 		// コマンドとファイルサイズの出力
 		try {
 			String size_info = "";
-			size_info += "image add " + file.getName() + CRLF;
+			size_info += file.getName() + CRLF;
 			size_info += "size=" + Long.toString(file.length()) + CRLF;
 			out.write(size_info.getBytes());
 		} catch (IOException e) {
 			log_mes.log_print(e);
+			try {
+				if(soc != null)
+					soc.close();
+			} catch (IOException e1) {
+				log_mes.log_print(e1);
+			}
 			return false;
 		}
 		
@@ -64,10 +94,17 @@ public class Image {
 				out.write(buffer, 0, len);
 			}
 			file_in.close();
+			soc.close();
 			return true;
 			
 		} catch (IOException e) {
 			log_mes.log_print(e);
+			try {
+				if(soc != null)
+					soc.close();
+			} catch (IOException e1) {
+				log_mes.log_print(e1);
+			}
 			return false;
 		}
 	}

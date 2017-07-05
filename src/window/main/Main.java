@@ -8,7 +8,7 @@ public class Main {
 		LogToSystemIO log = new LogToSystemIO();
 
 		TcpSocket tcp = new TcpSocket(log);
-		tcp.send("DB/source/松村.png");
+		tcp.send_img("DB/source/松村.png");
 	}
 
 }
