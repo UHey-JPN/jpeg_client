@@ -82,8 +82,12 @@ public class TcpSocket{
 	public synchronized boolean send_img(String name) {
 		try {
 			Image img = new Image(new File(name), log_mes);
-			out.println("image add " + name);				// 画像アップロードのコマンド
-			String[] soc_info = in.readLine().split(",");	// アップロード先の指示待ち
+			out.println("image add " + name);			// 画像アップロードのコマンド
+			String[] respo = in.readLine().split(":");	// アップロード先の指示待ち
+			
+			if( !respo[0].equals("OK") ) return false;
+			
+			String[] soc_info = respo[1].split(",");
 			String addr = soc_info[0];
 			int port = Integer.parseInt(soc_info[1]);
 			img.upload(new InetSocketAddress(addr, port));
