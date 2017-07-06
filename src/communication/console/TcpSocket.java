@@ -6,7 +6,6 @@ import data.image.Image;
 import window.main.LogMessageAdapter;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -79,10 +78,9 @@ public class TcpSocket{
 	}
 
 
-	public synchronized boolean send_img(String name) {
+	public synchronized boolean send_img(Image img) {
 		try {
-			Image img = new Image(new File(name), log_mes);
-			out.println("image add " + name);			// 画像アップロードのコマンド
+			out.println("image add " + img.get_name());			// 画像アップロードのコマンド
 			String[] respo = in.readLine().split(":");	// アップロード先の指示待ち
 			
 			if( !respo[0].equals("OK") ) return false;
@@ -99,7 +97,7 @@ public class TcpSocket{
 				return false;
 			}
 		} catch (FileNotFoundException e) {
-			log_mes.log_println("File(" + name + ") is not exist.");
+			log_mes.log_println("File(" + img.get_name() + ") is not exist.");
 			return false;
 		} catch (IOException e) {
 			log_mes.log_print(e);
