@@ -2,7 +2,7 @@ package window.main;
 
 import communication.console.TcpSocket;
 
-public class Main {
+public class TestClientMain {
 
 	public static void main(String[] args) {
 		LogToSystemIO log = new LogToSystemIO();
