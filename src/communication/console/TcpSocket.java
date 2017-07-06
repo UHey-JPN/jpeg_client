@@ -1,6 +1,7 @@
 package communication.console;
 
 import java.net.Socket;
+import java.net.SocketException;
 
 import data.image.Image;
 import window.main.LogMessageAdapter;
@@ -14,6 +15,7 @@ import java.net.InetSocketAddress;
 
 public class TcpSocket{
 	public static final String CRLF = "\r\n";
+	public static int TIMEOUT_MS = 2000;
 	
 	private Socket soc;
 	private BufferedReader in;
@@ -38,7 +40,7 @@ public class TcpSocket{
 			try {
 				soc = new Socket();
 				soc.connect(addr, 200);
-				soc.setSoTimeout(2000);
+				soc.setSoTimeout(TcpSocket.TIMEOUT_MS);
 				log_mes.log_println("connected to server("+ soc.getRemoteSocketAddress() +")");
 			} catch (IOException e) {
 				log_mes.log_print(e);
@@ -80,7 +82,8 @@ public class TcpSocket{
 
 	public synchronized boolean send_img(Image img) {
 		try {
-			out.println("image add " + img.get_name());			// 画像アップロードのコマンド
+			soc.setSoTimeout(0);
+			out.println("image add " + img.get_name());	// 画像アップロードのコマンド
 			String[] respo = in.readLine().split(":");	// アップロード先の指示待ち
 			
 			if( !respo[0].equals("OK") ) return false;
@@ -102,6 +105,12 @@ public class TcpSocket{
 		} catch (IOException e) {
 			log_mes.log_print(e);
 			return false;
+		} finally {
+			try {
+				soc.setSoTimeout(TcpSocket.TIMEOUT_MS);
+			} catch (SocketException e) {
+				log_mes.log_print(e);
+			}
 		}
 	}
 
