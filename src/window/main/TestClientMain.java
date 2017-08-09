@@ -16,6 +16,7 @@ public class TestClientMain {
 		try {
 			Image img = new Image(new File("DB/source/松村.png"), log);
 			tcp.send_img(img);
+			System.out.print(tcp.get_md5_list());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

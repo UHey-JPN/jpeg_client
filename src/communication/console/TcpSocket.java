@@ -2,6 +2,7 @@ package communication.console;
 
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 import data.image.Image;
 import window.main.LogMessageAdapter;
@@ -15,7 +16,7 @@ import java.net.InetSocketAddress;
 
 public class TcpSocket{
 	public static final String CRLF = "\r\n";
-	public static int TIMEOUT_MS = 2000;
+	public static final int TIMEOUT = 2000;
 	
 	private Socket soc;
 	private BufferedReader in;
@@ -40,7 +41,7 @@ public class TcpSocket{
 			try {
 				soc = new Socket();
 				soc.connect(addr, 200);
-				soc.setSoTimeout(TcpSocket.TIMEOUT_MS);
+				soc.setSoTimeout(TIMEOUT);
 				log_mes.log_println("connected to server("+ soc.getRemoteSocketAddress() +")");
 			} catch (IOException e) {
 				log_mes.log_print(e);
@@ -82,7 +83,6 @@ public class TcpSocket{
 
 	public synchronized boolean send_img(Image img) {
 		try {
-			soc.setSoTimeout(0);
 			out.println("image add " + img.get_name());	// 画像アップロードのコマンド
 			String[] respo = in.readLine().split(":");	// アップロード先の指示待ち
 			
@@ -94,6 +94,7 @@ public class TcpSocket{
 			img.upload(new InetSocketAddress(addr, port));
 			
 			// サーバーでの処理結果を確認
+			soc.setSoTimeout(0);
 			if(in.readLine().matches("OK")){
 				return true;
 			}else{
@@ -107,10 +108,31 @@ public class TcpSocket{
 			return false;
 		} finally {
 			try {
-				soc.setSoTimeout(TcpSocket.TIMEOUT_MS);
+				soc.setSoTimeout(TIMEOUT);
 			} catch (SocketException e) {
 				log_mes.log_print(e);
 			}
+		}
+	}
+
+	public String get_md5_list() {
+		String ret = "";
+		if( soc != null ){
+			out.println("image list");
+			try{
+				String result;
+				while( !(result = in.readLine()).matches("") ){
+					ret += result;
+				}
+			} catch (SocketTimeoutException e){
+				log_mes.log_print(e);
+			} catch (IOException e) {
+				log_mes.log_print(e);
+			}
+			return ret;
+		}else{
+			log_mes.log_println("socket is not opened.");
+			return null;
 		}
 	}
 
