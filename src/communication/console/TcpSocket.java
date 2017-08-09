@@ -122,7 +122,7 @@ public class TcpSocket{
 			try{
 				String result;
 				while( !(result = in.readLine()).matches("") ){
-					ret += result;
+					ret += result + CRLF;
 				}
 			} catch (SocketTimeoutException e){
 				log_mes.log_print(e);
