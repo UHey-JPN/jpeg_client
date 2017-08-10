@@ -1,9 +1,7 @@
 package communication.dataGetter;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -31,7 +29,6 @@ public class TcpImageDataGetter implements Runnable {
 		Socket soc = null;
 		InputStream in = null;
 		PrintWriter out = null;
-		String ret = null;
 		
 		try {
 			soc = new Socket(state.get_server_ip(), state.get_db_port());
@@ -39,7 +36,8 @@ public class TcpImageDataGetter implements Runnable {
 			out = new PrintWriter(soc.getOutputStream(), true);
 			
 			// set data type
-			out.println( "image " + name );
+			out.println( "image," + name );
+			log_mes.log_println("  -> name = " + name);
 			
 			try {
 				int size;
@@ -50,15 +48,16 @@ public class TcpImageDataGetter implements Runnable {
 				
 				// 改行が1つ来るまで待つ
 				for(int i = 0; ; i++){
-					while( in.available() < 1 );		// Readで読み出せるなら読み出す
+					while( in.available() < 1 );				// Readで読み出せるなら読み出す
 					buf_header[i] = (byte)in.read();
 					header = new String(buf_header, 0, i+1);	// ヘッダー情報を保存
-					if( (header+"line").split(CRLF).length == 2 ) break;// 改行で区切って、3つ以上
+					if( (header+"line").split(CRLF).length == 2 ) break;// 改行で区切って、2つ以上
 				}
 				
 				// ヘッダー情報を取り出し
-				header_split = header.split(":");
+				header_split = header.split(CRLF)[0].split(":");
 				if( !header_split[0].equals("ACK") ){
+					log_mes.log_println("NAK is sent from server. :" + header.split(CRLF)[0]);
 					listener.set_new_database(null);
 					return;
 				}
@@ -66,6 +65,7 @@ public class TcpImageDataGetter implements Runnable {
 				// ファイルサイズを読み出し
 				size = Integer.parseInt(header_split[1]);
 				buf_data = new byte[size];
+				log_mes.log_println("  -> size = " + size);
 				
 				for(int i = 0; i < size; i++ ){
 					int buf = in.read();
@@ -75,6 +75,9 @@ public class TcpImageDataGetter implements Runnable {
 					}
 					buf_data[i] = (byte)buf;
 				}
+				
+				// サーバーによるコネクション切断を待つ
+				while( in.read() != -1 );
 				
 				listener.set_new_database(buf_data);
 
