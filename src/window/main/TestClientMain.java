@@ -27,7 +27,7 @@ public class TestClientMain implements ImageDataGetterListener {
 		TcpSocket tcp = new TcpSocket(log);
 		
 		try {
-			Image img = new Image(new File("DB/source/松村.png"), log);
+			Image img = new Image(new File("DB/source/松.png"), log);
 			tcp.send_img(img);
 			System.out.print(tcp.get_md5_list());
 		} catch (IOException e) {
@@ -37,7 +37,7 @@ public class TestClientMain implements ImageDataGetterListener {
 		// 画像をダウンロードして表示
 		Executor ex = Executors.newCachedThreadPool();
 		ServerData d = new ServerData("127.0.0.1", 50000, 51234, 50000);
-		ex.execute(new TcpImageDataGetter("松村.png", this, d, log));
+		ex.execute(new TcpImageDataGetter("松.png", this, d, log));
 
 		
 	}
