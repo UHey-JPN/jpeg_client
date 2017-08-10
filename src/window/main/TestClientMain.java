@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 import communication.console.TcpSocket;
 import communication.dataGetter.ImageDataGetterListener;
 import communication.dataGetter.TcpImageDataGetter;
+import data.communication.ServerData;
 import data.image.Image;
 
 public class TestClientMain implements ImageDataGetterListener {
@@ -35,7 +36,8 @@ public class TestClientMain implements ImageDataGetterListener {
 		
 		// 画像をダウンロードして表示
 		Executor ex = Executors.newCachedThreadPool();
-		ex.execute(new TcpImageDataGetter("松村.png", this, null, log));
+		ServerData d = new ServerData("127.0.0.1", 50000, 51234, 50000);
+		ex.execute(new TcpImageDataGetter("松村.png", this, d, log));
 
 		
 	}
