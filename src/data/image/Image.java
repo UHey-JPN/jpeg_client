@@ -99,7 +99,22 @@ public class Image {
 			log_mes.log_print(e);
 			return false;
 		}
-		
+
+		return upload_data(out);
+	}
+	
+	/**
+	 * プロトコルに従ってファイルを送信。OutputStreamを受け取る。
+	 * ファイルのデータ部分のみ送信する。
+	 * 
+	 * @param addr - OutputStream ファイルを送信する先を指定。
+	 * @return
+	 * {@code true} : 送信処理が正常に終了。<br>
+	 * {@code false} : 送信処理が正常に終了。
+	 * 
+	 * @throws FileNotFoundException
+	 */
+	public boolean upload_data(OutputStream out) throws FileNotFoundException{	
 		// ファイルデータの出力
 		try {
 			int len;
@@ -135,7 +150,8 @@ public class Image {
 			
 			for(int i = 0; ; i++){
 				if( i >= buf.length ) return false;					// バッファーのオーバーラン
-				if( in.available() > 0 ) buf[i] = (byte)in.read();	// Readから読み出せるなら読み出す
+				while( in.available() < 1 );
+				buf[i] = (byte)in.read();	// Readから読み出せるなら読み出す
 				header = new String(buf, 0, i+1);					// ヘッダー情報を保存
 				if( (header+"line").split(CRLF).length == 3 ) break;// 改行で区切って、3つ以上
 			}
@@ -256,6 +272,10 @@ public class Image {
 			log_mes.log_print(e);
 			return null;
 		}
+	}
+
+	public long size() {
+		return file.length();
 	}
 
 }
