@@ -49,8 +49,12 @@ public class TestClientMain implements ImageDataGetterListener {
 	@Override
 	public void set_new_database(byte[] data) {
 		try{
-		  BufferedImage image = ImageIO.read( new ByteArrayInputStream( data ) );
-		  new MyFrame(image);
+			BufferedImage image = ImageIO.read( new ByteArrayInputStream( data ) );
+			if( data == null ){
+				System.out.println("データ取得に失敗");
+			}
+			System.out.println("fin");
+			new MyFrame(image);
 		}catch( Exception e ){
 			
 		}		
